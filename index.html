@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script type="text/javascript">
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                try {
+                    navigator.serviceWorker.register('sw.js');
+                    console.log("Service Worker registered successfully!")
+                } catch (e) {
+                    console.error(e)
+                }
+            });
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+
+        main.container {
+            max-width: 760px;
+            padding-block: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-header hgroup { margin-bottom: 0; }
+        .page-header button { margin-bottom: 0; width: auto; }
+
+        article header { margin-bottom: 1rem; }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .counter button { margin-bottom: 0; }
+
+        .counter .count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            min-width: 2.5rem;
+            text-align: center;
+        }
+
+        .echo p {
+            margin-bottom: 0;
+            min-height: 1.5rem;
+            color: var(--pico-muted-color);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .status-badge .dot {
+            width: 0.7rem;
+            height: 0.7rem;
+            border-radius: 50%;
+            background: var(--pico-del-color);
+        }
+
+        .status-badge[data-online="true"] .dot { background: #2e7d32; }
+    </style>
+</head>
+
+<body
+    x-data="{
+        deferredPrompt: null,
+        canInstall: false,
+        async install() {
+            if (!this.deferredPrompt) return;
+            this.deferredPrompt.prompt();
+            const { outcome } = await this.deferredPrompt.userChoice;
+            console.log('Install outcome:', outcome);
+            this.deferredPrompt = null;
+            this.canInstall = false;
+        }
+    }"
+    @beforeinstallprompt.window="
+        $event.preventDefault();
+        deferredPrompt = $event;
+        canInstall = true;
+    "
+    @appinstalled.window="canInstall = false; deferredPrompt = null;"
+>
+    <main class="container">
+        <header class="page-header">
+            <hgroup>
+                <h1>Medienapplikationen Übung</h1>
+                <p>A small progressive web app playground.</p>
+            </hgroup>
+            <button x-cloak x-show="canInstall" @click="install()">Install app</button>
+        </header>
+
+        <article>
+            <header><strong>Counter</strong></header>
+            <div class="counter" x-data="{ count: 0 }">
+                <button class="outline" x-on:click="count--">−</button>
+                <span class="count" x-text="count"></span>
+                <button x-on:click="count++">+</button>
+            </div>
+        </article>
+
+        <article class="echo" x-data="{ message: '' }">
+            <header><strong>Echo</strong></header>
+            <input type="text" x-model="message" placeholder="Type something…">
+            <p x-text="message || 'Your text appears here.'"></p>
+        </article>
+
+        <article>
+            <header><strong>Connection status</strong></header>
+            <span class="status-badge"
+                x-data="{ status: navigator.onLine }"
+                :data-online="status"
+                @offline.window="status=false"
+                @online.window="status=true">
+                <span class="dot"></span>
+                <span x-text="status ? 'Online' : 'Offline'"></span>
+            </span>
+        </article>
+    </main>
+</body>
+
+</html
