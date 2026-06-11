@@ -79,21 +79,34 @@
 
         .status-badge[data-online="true"] .dot { background: #2e7d32; }
 
-        .orientation .readout {
+        .readout {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             margin-bottom: 1rem;
         }
 
-        .orientation .axis {
+        .readout.two-up {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .geolocation .actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .geolocation .actions > * { margin-bottom: 0; }
+
+        .axis {
             text-align: center;
             padding: 1rem 0.5rem;
             border-radius: var(--pico-border-radius);
             background: var(--pico-card-sectioning-background-color);
         }
 
-        .orientation .axis .label {
+        .axis .label {
             display: block;
             font-size: 0.8rem;
             text-transform: uppercase;
@@ -101,7 +114,7 @@
             color: var(--pico-muted-color);
         }
 
-        .orientation .axis .value {
+        .axis .value {
             display: block;
             font-size: 1.75rem;
             font-weight: 700;
@@ -247,6 +260,82 @@
                     <div class="stage" :style="`background-color: ${background}`">
                         <span x-text="background"></span>
                     </div>
+                </div>
+            </template>
+        </article>
+
+        <article class="geolocation"
+            x-data="{
+                supported: 'geolocation' in navigator,
+                loading: false,
+                latitude: null,
+                longitude: null,
+                error: '',
+                get hasPosition() {
+                    return this.latitude !== null && this.longitude !== null;
+                },
+                get mapLink() {
+                    if (!this.hasPosition) return '#';
+                    return `https://www.openstreetmap.org/?mlat=${this.latitude}&mlon=${this.longitude}#map=16/${this.latitude}/${this.longitude}`;
+                },
+                locate() {
+                    this.error = '';
+                    this.loading = true;
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            this.latitude = position.coords.latitude;
+                            this.longitude = position.coords.longitude;
+                            this.loading = false;
+                        },
+                        (err) => {
+                            this.loading = false;
+                            if (err.code === err.PERMISSION_DENIED) {
+                                this.error = 'Permission to access your location was denied.';
+                            } else if (err.code === err.POSITION_UNAVAILABLE) {
+                                this.error = 'Your location is currently unavailable.';
+                            } else if (err.code === err.TIMEOUT) {
+                                this.error = 'The request to get your location timed out.';
+                            } else {
+                                this.error = 'An unknown error occurred while getting your location.';
+                            }
+                        }
+                    );
+                }
+            }"
+        >
+            <header><strong>Geolocation</strong></header>
+
+            <template x-if="!supported">
+                <p>Your device or browser does not support geolocation.</p>
+            </template>
+
+            <template x-if="supported">
+                <div>
+                    <div class="actions">
+                        <button @click="locate()" :aria-busy="loading" :disabled="loading">
+                            <span x-text="loading ? 'Locating…' : 'Get my location'"></span>
+                        </button>
+                        <a x-show="hasPosition" :href="mapLink" target="_blank" rel="noopener noreferrer" role="button" class="outline">
+                            View on OpenStreetMap
+                        </a>
+                    </div>
+
+                    <template x-if="error">
+                        <p style="color: var(--pico-del-color); margin-top: 1rem;" x-text="error"></p>
+                    </template>
+
+                    <template x-if="hasPosition">
+                        <div class="readout two-up" style="margin-top: 1rem;">
+                            <div class="axis">
+                                <span class="label">Latitude</span>
+                                <span class="value" x-text="latitude.toFixed(5)"></span>
+                            </div>
+                            <div class="axis">
+                                <span class="label">Longitude</span>
+                                <span class="value" x-text="longitude.toFixed(5)"></span>
+                            </div>
+                        </div>
+                    </template>
                 </div>
             </template>
         </article>
