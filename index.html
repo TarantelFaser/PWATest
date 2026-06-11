@@ -228,6 +228,48 @@
                 </div>
             </template>
         </article>
+
+        <article class="share"
+            x-data="{
+                copied: false,
+                error: '',
+                async share() {
+                    this.error = '';
+                    const data = {
+                        title: 'Medienapplikationen Übung',
+                        text: 'Check out this progressive web app playground.',
+                        url: window.location.href
+                    };
+                    if (navigator.share) {
+                        try {
+                            await navigator.share(data);
+                        } catch (err) {
+                            // AbortError = user cancelled the share sheet, not a real error
+                            if (err.name !== 'AbortError') {
+                                this.error = 'Sharing failed. Please try again.';
+                            }
+                        }
+                    } else {
+                        try {
+                            await navigator.clipboard.writeText(window.location.href);
+                            this.copied = true;
+                            setTimeout(() => this.copied = false, 2000);
+                        } catch (err) {
+                            this.error = 'Could not copy the link to your clipboard.';
+                        }
+                    }
+                }
+            }"
+        >
+            <header><strong>Share</strong></header>
+            <div class="actions">
+                <button @click="share()">Share this page</button>
+                <span x-cloak x-show="copied" x-transition class="copied-info">Link copied</span>
+            </div>
+            <template x-if="error">
+                <p style="color: var(--pico-del-color); margin-top: 1rem;" x-text="error"></p>
+            </template>
+        </article>
     </main>
 </body>
 

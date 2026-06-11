@@ -76,6 +76,19 @@ article header { margin-bottom: 1rem; }
 
 .geolocation .actions > * { margin-bottom: 0; }
 
+.share .actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.share .actions button { margin-bottom: 0; width: auto; }
+
+.share .copied-info {
+    font-weight: 600;
+    color: #2e7d32;
+}
+
 .axis {
     text-align: center;
     padding: 1rem 0.5rem;
