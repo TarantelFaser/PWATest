@@ -7,6 +7,7 @@
     <title>Test PWA</title>
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="styles.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script type="text/javascript">
         if ('serviceWorker' in navigator) {
@@ -20,118 +21,6 @@
             });
         }
     </script>
-    <style>
-        [x-cloak] { display: none !important; }
-
-        main.container {
-            max-width: 760px;
-            padding-block: 2rem;
-        }
-
-        .page-header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .page-header hgroup { margin-bottom: 0; }
-        .page-header button { margin-bottom: 0; width: auto; }
-
-        article header { margin-bottom: 1rem; }
-
-        .counter {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .counter button { margin-bottom: 0; }
-
-        .counter .count {
-            font-size: 1.5rem;
-            font-weight: 700;
-            min-width: 2.5rem;
-            text-align: center;
-        }
-
-        .echo p {
-            margin-bottom: 0;
-            min-height: 1.5rem;
-            color: var(--pico-muted-color);
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-        }
-
-        .status-badge .dot {
-            width: 0.7rem;
-            height: 0.7rem;
-            border-radius: 50%;
-            background: var(--pico-del-color);
-        }
-
-        .status-badge[data-online="true"] .dot { background: #2e7d32; }
-
-        .readout {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .readout.two-up {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .geolocation .actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-        .geolocation .actions > * { margin-bottom: 0; }
-
-        .axis {
-            text-align: center;
-            padding: 1rem 0.5rem;
-            border-radius: var(--pico-border-radius);
-            background: var(--pico-card-sectioning-background-color);
-        }
-
-        .axis .label {
-            display: block;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--pico-muted-color);
-        }
-
-        .axis .value {
-            display: block;
-            font-size: 1.75rem;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .orientation .stage {
-            height: 8rem;
-            border-radius: var(--pico-border-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: rgba(0, 0, 0, 0.75);
-            transition: background-color 0.1s linear;
-        }
-    </style>
 </head>
 
 <body
