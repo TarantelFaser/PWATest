@@ -78,6 +78,46 @@
         }
 
         .status-badge[data-online="true"] .dot { background: #2e7d32; }
+
+        .orientation .readout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .orientation .axis {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            border-radius: var(--pico-border-radius);
+            background: var(--pico-card-sectioning-background-color);
+        }
+
+        .orientation .axis .label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--pico-muted-color);
+        }
+
+        .orientation .axis .value {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .orientation .stage {
+            height: 8rem;
+            border-radius: var(--pico-border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.75);
+            transition: background-color 0.1s linear;
+        }
     </style>
 </head>
 
@@ -135,6 +175,80 @@
                 <span class="dot"></span>
                 <span x-text="status ? 'Online' : 'Offline'"></span>
             </span>
+        </article>
+
+        <article class="orientation"
+            x-data="{
+                alpha: 0,
+                beta: 0,
+                gamma: 0,
+                supported: 'DeviceOrientationEvent' in window,
+                needsPermission: typeof DeviceOrientationEvent !== 'undefined'
+                    && typeof DeviceOrientationEvent.requestPermission === 'function',
+                listening: false,
+                handle(event) {
+                    this.alpha = event.alpha ?? 0;
+                    this.beta = event.beta ?? 0;
+                    this.gamma = event.gamma ?? 0;
+                },
+                start() {
+                    window.addEventListener('deviceorientation', (e) => this.handle(e));
+                    this.listening = true;
+                },
+                async enable() {
+                    if (this.needsPermission) {
+                        try {
+                            const result = await DeviceOrientationEvent.requestPermission();
+                            if (result !== 'granted') return;
+                        } catch (e) {
+                            console.error(e);
+                            return;
+                        }
+                    }
+                    this.start();
+                },
+                get background() {
+                    // alpha 0–360 → red, beta -180–180 → green, gamma -90–90 → blue
+                    const r = Math.round((this.alpha / 360) * 255);
+                    const g = Math.round(((this.beta + 180) / 360) * 255);
+                    const b = Math.round(((this.gamma + 90) / 180) * 255);
+                    return `rgb(${r}, ${g}, ${b})`;
+                }
+            }"
+            x-init="if (!needsPermission) start()"
+        >
+            <header><strong>Device orientation</strong></header>
+
+            <template x-if="!supported">
+                <p>Your device or browser does not support the orientation sensor.</p>
+            </template>
+
+            <template x-if="supported">
+                <div>
+                    <button x-cloak x-show="needsPermission && !listening" @click="enable()">
+                        Enable orientation sensor
+                    </button>
+
+                    <div class="readout">
+                        <div class="axis">
+                            <span class="label">Alpha (z)</span>
+                            <span class="value" x-text="alpha.toFixed(1) + '°'"></span>
+                        </div>
+                        <div class="axis">
+                            <span class="label">Beta (x)</span>
+                            <span class="value" x-text="beta.toFixed(1) + '°'"></span>
+                        </div>
+                        <div class="axis">
+                            <span class="label">Gamma (y)</span>
+                            <span class="value" x-text="gamma.toFixed(1) + '°'"></span>
+                        </div>
+                    </div>
+
+                    <div class="stage" :style="`background-color: ${background}`">
+                        <span x-text="background"></span>
+                    </div>
+                </div>
+            </template>
         </article>
     </main>
 </body>
