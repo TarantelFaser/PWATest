@@ -52,6 +52,104 @@
             <button x-cloak x-show="canInstall" @click="install()">Install app</button>
         </header>
 
+        <article class="shared"
+            x-data="{
+                title: '',
+                text: '',
+                url: '',
+                files: [],
+                get hasContent() {
+                    return this.title || this.text || this.url || this.files.length;
+                },
+                read() {
+                    const params = new URLSearchParams(window.location.search);
+                    this.title = params.get('title') || '';
+                    this.text = params.get('text') || '';
+                    this.url = params.get('url') || '';
+                    this.readFiles(parseInt(params.get('files') || '0', 10));
+                },
+                async readFiles(count) {
+                    if (!count || !('caches' in window)) return;
+                    const cache = await caches.open('tpwa-shared-files');
+                    for (let i = 0; i < count; i++) {
+                        const response = await cache.match('./shared-file-' + i);
+                        if (!response) continue;
+                        const blob = await response.blob();
+                        const name = decodeURIComponent(response.headers.get('X-Shared-File-Name') || ('file-' + i));
+                        this.files.push({
+                            name,
+                            size: blob.size,
+                            isImage: blob.type.startsWith('image/'),
+                            objectUrl: URL.createObjectURL(blob)
+                        });
+                    }
+                },
+                formatSize(bytes) {
+                    if (bytes < 1024) return bytes + ' B';
+                    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                },
+                async clear() {
+                    this.title = '';
+                    this.text = '';
+                    this.url = '';
+                    this.files.forEach((file) => URL.revokeObjectURL(file.objectUrl));
+                    this.files = [];
+                    if ('caches' in window) await caches.delete('tpwa-shared-files');
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }"
+            x-init="read()"
+            x-cloak
+            x-show="hasContent"
+        >
+            <header><strong>Shared with this app</strong></header>
+
+            <template x-if="title">
+                <div class="shared-field">
+                    <span class="label">Title</span>
+                    <p x-text="title"></p>
+                </div>
+            </template>
+
+            <template x-if="text">
+                <div class="shared-field">
+                    <span class="label">Text</span>
+                    <p x-text="text"></p>
+                </div>
+            </template>
+
+            <template x-if="url">
+                <div class="shared-field">
+                    <span class="label">Link</span>
+                    <p><a :href="url" target="_blank" rel="noopener noreferrer" x-text="url"></a></p>
+                </div>
+            </template>
+
+            <template x-if="files.length">
+                <div class="shared-field">
+                    <span class="label">Files</span>
+                    <div class="shared-files">
+                        <template x-for="(file, index) in files" :key="index">
+                            <div class="shared-file">
+                                <template x-if="file.isImage">
+                                    <img :src="file.objectUrl" :alt="file.name">
+                                </template>
+                                <div class="shared-file-meta">
+                                    <a :href="file.objectUrl" :download="file.name" x-text="file.name"></a>
+                                    <span class="shared-file-size" x-text="formatSize(file.size)"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <div class="actions">
+                <button class="outline" @click="clear()">Clear</button>
+            </div>
+        </article>
+
         <article>
             <header><strong>Counter</strong></header>
             <div class="counter" x-data="{ count: 0 }">

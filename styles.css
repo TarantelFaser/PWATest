@@ -89,6 +89,62 @@ article header { margin-bottom: 1rem; }
     color: #2e7d32;
 }
 
+.shared-field { margin-bottom: 1rem; }
+
+.shared-field .label {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pico-muted-color);
+}
+
+.shared-field p {
+    margin-bottom: 0;
+    word-break: break-word;
+}
+
+.shared .actions { display: flex; }
+.shared .actions button { margin-bottom: 0; width: auto; }
+
+.shared-files {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.shared-file {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: var(--pico-border-radius);
+    background: var(--pico-card-sectioning-background-color);
+}
+
+.shared-file img {
+    width: 4rem;
+    height: 4rem;
+    object-fit: cover;
+    border-radius: var(--pico-border-radius);
+    flex-shrink: 0;
+}
+
+.shared-file-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.shared-file-meta a { word-break: break-word; }
+
+.shared-file-size {
+    font-size: 0.8rem;
+    color: var(--pico-muted-color);
+}
+
 .axis {
     text-align: center;
     padding: 1rem 0.5rem;
