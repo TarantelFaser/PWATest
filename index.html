@@ -265,6 +265,12 @@
                     if (!this.hasPosition) return '#';
                     return `https://www.openstreetmap.org/?mlat=${this.latitude}&mlon=${this.longitude}#map=16/${this.latitude}/${this.longitude}`;
                 },
+                get embedSrc() {
+                    if (!this.hasPosition) return '';
+                    const d = 0.005;
+                    const bbox = [this.longitude - d, this.latitude - d, this.longitude + d, this.latitude + d].join(',');
+                    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${this.latitude},${this.longitude}`;
+                },
                 locate() {
                     this.error = '';
                     this.loading = true;
@@ -297,7 +303,7 @@
             </template>
 
             <template x-if="supported">
-                <div>
+                <div style="display: flex; flex-direction: column;">
                     <div class="actions">
                         <button @click="locate()" :aria-busy="loading" :disabled="loading">
                             <span x-text="loading ? 'Locating…' : 'Get my location'"></span>
@@ -322,6 +328,11 @@
                                 <span class="value" x-text="longitude.toFixed(5)"></span>
                             </div>
                         </div>
+                    </template>
+
+                    <template x-if="hasPosition">
+                        <iframe class="map-embed" :src="embedSrc" loading="lazy"
+                            title="Map showing your current location"></iframe>
                     </template>
                 </div>
             </template>

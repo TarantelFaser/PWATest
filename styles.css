@@ -76,6 +76,19 @@ article header { margin-bottom: 1rem; }
 
 .geolocation .actions > * { margin-bottom: 0; }
 
+.map-embed {
+    flex-grow: 1;
+    aspect-ratio: 1/2;
+    display: block;
+    width: calc(100% + (var(--pico-block-spacing-horizontal, 1rem) * 2));
+    height: clamp(320px, 50vh, 560px);
+    margin: 1rem calc(var(--pico-block-spacing-horizontal, 1rem) * -1)
+        calc(var(--pico-block-spacing-vertical, 1rem) * -1);
+    border: 0;
+    border-top: 1px solid var(--pico-card-border-color);
+    border-radius: 0 0 var(--pico-border-radius) var(--pico-border-radius);
+}
+
 .share .actions {
     display: flex;
     align-items: center;
